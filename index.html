@@ -3,8 +3,57 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>The Regret Minimization Calculator</title>
+
+<!-- Primary Meta Tags -->
+<title>RegretNot | The Regret Minimization Calculator</title>
+<meta name="title" content="RegretNot | The Regret Minimization Calculator">
+<meta name="description" content="Facing a tough choice? RegretNot uses Jeff Bezos's famous Regret Minimization Framework to help you make decisions your 80-year-old self will be proud of.">
+<meta name="author" content="RegretNot">
+<meta name="robots" content="index, follow">
+<meta name="theme-color" content="#0e0e12">
+
+<!-- Open Graph / Facebook / LinkedIn -->
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://regretnot.app/">
+<meta property="og:title" content="RegretNot | The Regret Minimization Calculator">
+<meta property="og:description" content="Facing a tough choice? RegretNot uses Jeff Bezos's famous Regret Minimization Framework to help you make decisions your 80-year-old self will be proud of.">
+<meta property="og:image" content="https://regretnot.app/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:site_name" content="RegretNot">
+<meta property="og:locale" content="en_US">
+
+<!-- Twitter / X -->
+<meta property="twitter:card" content="summary_large_image">
+<meta property="twitter:url" content="https://regretnot.app/">
+<meta property="twitter:title" content="RegretNot | The Regret Minimization Calculator">
+<meta property="twitter:description" content="Facing a tough choice? RegretNot uses Jeff Bezos's famous Regret Minimization Framework to help you make decisions your 80-year-old self will be proud of.">
+<meta property="twitter:image" content="https://regretnot.app/og-image.png">
+
+<!-- Canonical -->
+<link rel="canonical" href="https://regretnot.app/">
+
+<!-- Favicon: inline SVG as data URI — no extra files needed -->
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230e0e12'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' font-size='40' font-family='Georgia%2Cserif' fill='%23d4933a'%3E∞%3C/text%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%230e0e12'/%3E%3Ctext x='50%25' y='54%25' dominant-baseline='middle' text-anchor='middle' font-size='40' font-family='Georgia%2Cserif' fill='%23d4933a'%3E∞%3C/text%3E%3C/svg%3E">
+
+<!-- Structured Data (JSON-LD) for SEO -->
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "RegretNot",
+  "description": "Facing a tough choice? RegretNot uses Jeff Bezos's famous Regret Minimization Framework to help you make decisions your 80-year-old self will be proud of.",
+  "url": "https://regretnot.app/",
+  "applicationCategory": "LifestyleApplication",
+  "operatingSystem": "All",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+}
+</script>
+
+<!-- Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Crimson+Pro:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
 
 <style>
@@ -810,14 +859,16 @@
 <section id="screen-landing" class="screen active">
   <div class="landing-glow"></div>
 
-  <p class="eyebrow">Jeff Bezos's Mental Model</p>
+  <p class="eyebrow" style="font-size:11px;letter-spacing:0.3em;">Your compass for a no-regrets life</p>
+
+  <div style="font-family:var(--serif);font-size:clamp(2rem,5vw,3rem);font-weight:700;color:var(--amber);letter-spacing:-0.01em;margin-bottom:4px;">RegretNot</div>
 
   <h1 class="hero-title">
     What will <em>80-year-old you</em><br>wish you had done?
   </h1>
 
   <p class="hero-sub">
-    A structured framework to make your hardest decisions — by looking back from the end of your life.
+    Facing a tough choice? Apply Jeff Bezos's famous Regret Minimization Framework to your life. Find clarity and avoid future regrets — free, in minutes.
   </p>
 
   <div class="bezos-quote">
@@ -852,7 +903,7 @@
 ════════════════════════════════════════ -->
 <section id="screen-quiz" class="screen">
   <div class="quiz-header">
-    <div class="quiz-logo">Regret Minimization</div>
+    <div class="quiz-logo" style="color:var(--amber);font-weight:700;">RegretNot</div>
     <div class="progress-bar-wrap">
       <div class="progress-bar-fill" id="progress-fill" style="width:0%"></div>
     </div>
@@ -930,7 +981,11 @@
     <div class="share-buttons">
       <button class="btn-share primary-share" onclick="copyShareText()">📋 Copy result</button>
       <a class="btn-share" id="twitter-share" href="#" target="_blank" rel="noopener">𝕏 Share on X</a>
-      <button class="btn-share" onclick="downloadImage()">⬇ Save as image</button>
+      <a class="btn-share" id="whatsapp-share" href="#" target="_blank" rel="noopener" style="color:#25d366;border-color:#25d366;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        WhatsApp
+      </a>
+      <button class="btn-share" onclick="downloadImage()">⬇ Save image</button>
     </div>
   </div>
 
@@ -1432,11 +1487,19 @@ function showResult() {
   `;
   document.getElementById('letter-sig').innerHTML = `With love and hindsight,<br><em>You, at 80</em>`;
 
-  // Twitter share
+  // Twitter / X share
   const tweetText = encodeURIComponent(
-    `I just used The Regret Minimization Calculator — a framework based on Jeff Bezos's mental model for big life decisions.\n\nMy verdict: "${analysis.verdict}"\n\nTry it: `
+    `Just used RegretNot — Jeff Bezos's Regret Minimization Framework as a decision tool.\n\nMy verdict: "${analysis.verdict}"\nClarity score: ${analysis.composite}/100\n\nTry it 👇`
   );
-  document.getElementById('twitter-share').href = `https://twitter.com/intent/tweet?text=${tweetText}&url=${encodeURIComponent(location.href)}`;
+  document.getElementById('twitter-share').href =
+    `https://twitter.com/intent/tweet?text=${tweetText}&url=${encodeURIComponent('https://regretnot.app')}`;
+
+  // WhatsApp share
+  const waText = encodeURIComponent(
+    `I just used RegretNot to work through a big life decision using Jeff Bezos's Regret Minimization Framework.\n\nMy verdict: "${analysis.verdict}"\n\nTry it here: https://regretnot.app`
+  );
+  document.getElementById('whatsapp-share').href =
+    `https://wa.me/?text=${waText}`;
 }
 
 // ─────────────────────────────────────────
@@ -1452,97 +1515,129 @@ function showTooltip(msg) {
 function copyShareText() {
   const analysis = analyze();
   const a = state.answers;
-  const text = `🧠 The Regret Minimization Calculator
+  const text = `🧭 RegretNot — Your Compass for a No-Regrets Life
 
 My decision: "${a.decision || '...'}"
+
 Verdict: ${analysis.verdict}
-Regret score if I don't act: ${analysis.regretScore}/100
-Overall clarity: ${analysis.composite}/100
+Regret score (if I don't act): ${analysis.regretScore}/100
+Clarity score: ${analysis.composite}/100
 
 "${analysis.title}"
 
-Try it yourself: ${location.href}`;
+Based on Jeff Bezos's Regret Minimization Framework.
+Try it free 👉 https://regretnot.app`;
 
   navigator.clipboard.writeText(text).then(() => showTooltip('✓ Copied to clipboard'));
 }
 
 function downloadImage() {
-  const canvas = document.getElementById('cert-canvas');
-  const ctx = canvas.getContext('2d');
-  const W = 1200, H = 630;
-  canvas.width = W; canvas.height = H;
-
   const analysis = analyze();
   const a = state.answers;
+  generateRegretNotImage(analysis.verdict, a.decision || '', analysis);
 
-  // Background
-  ctx.fillStyle = '#0e0e12';
-  ctx.fillRect(0, 0, W, H);
-
-  // Amber accent bar
-  ctx.fillStyle = '#d4933a';
-  ctx.fillRect(0, 0, 6, H);
-
-  // Border
-  ctx.strokeStyle = '#2a2a38';
-  ctx.lineWidth = 1;
-  ctx.strokeRect(30, 30, W - 60, H - 60);
-
-  // Eyebrow
-  ctx.fillStyle = '#d4933a';
-  ctx.font = '600 14px Georgia';
-  ctx.letterSpacing = '0.2em';
-  ctx.fillText('REGRET MINIMIZATION CALCULATOR', 80, 90);
-
-  // Verdict
-  ctx.fillStyle = '#e8e4d8';
-  ctx.font = 'italic 400 52px Georgia';
-  const verdict = analysis.verdict;
-  ctx.fillText(verdict, 80, 180);
-
-  // Decision preview
-  const dec = (a.decision || '').substring(0, 70) + ((a.decision || '').length > 70 ? '…' : '');
-  ctx.fillStyle = '#8a8578';
-  ctx.font = '300 22px Georgia';
-  ctx.fillText('"' + dec + '"', 80, 240);
-
-  // Title
-  ctx.fillStyle = '#e8e4d8';
-  ctx.font = '400 28px Georgia';
-  const title = analysis.title;
-  ctx.fillText(title, 80, 320);
-
-  // Scores
-  const scores = [
-    { label: 'Regret if you don\'t', val: analysis.regretScore },
-    { label: 'Decision autonomy', val: 100 - analysis.socialFear },
-    { label: 'Clarity score', val: analysis.composite },
-  ];
-  scores.forEach((s, i) => {
-    const x = 80 + i * 340;
-    ctx.fillStyle = '#d4933a';
-    ctx.font = 'bold 48px Georgia';
-    ctx.fillText(s.val, x, 430);
-    ctx.fillStyle = '#8a8578';
-    ctx.font = '300 15px Georgia';
-    ctx.fillText(s.label.toUpperCase(), x, 460);
-  });
-
-  // Footer
-  ctx.fillStyle = '#444050';
-  ctx.font = '300 14px Georgia';
-  ctx.fillText('regret-minimization-calculator.github.io', 80, H - 50);
-
-  ctx.fillStyle = '#d4933a';
-  ctx.font = 'italic 400 15px Georgia';
-  ctx.fillText('"What will 80-year-old you wish you had done?"', W - 80 - 420, H - 50);
-
-  // Download
+  const canvas = document.getElementById('cert-canvas');
   const link = document.createElement('a');
-  link.download = 'regret-minimization-result.png';
+  link.download = 'regretnot-verdict.png';
   link.href = canvas.toDataURL('image/png');
   link.click();
   showTooltip('✓ Image downloaded');
+}
+
+function generateRegretNotImage(verdictText, decisionSummary, analysis) {
+  const canvas = document.getElementById('cert-canvas');
+  canvas.width = 1200;
+  canvas.height = 630;
+  const ctx = canvas.getContext('2d');
+  const W = 1200, H = 630;
+
+  // 1. Dark background
+  ctx.fillStyle = '#0e0e12';
+  ctx.fillRect(0, 0, W, H);
+
+  // 2. Subtle grain texture
+  for (let i = 0; i < 40000; i++) {
+    ctx.fillStyle = 'rgba(255,255,255,0.015)';
+    ctx.fillRect(Math.random() * W, Math.random() * H, 1, 1);
+  }
+
+  // 3. Amber inner border
+  ctx.strokeStyle = 'rgba(212,147,58,0.35)';
+  ctx.lineWidth = 2;
+  ctx.strokeRect(40, 40, W - 80, H - 80);
+
+  // 4. Brand eyebrow — centered
+  ctx.fillStyle = '#d4933a';
+  ctx.font = "bold 13px Georgia";
+  ctx.textAlign = "center";
+  ctx.fillText("REGRETNOT  •  YOUR FUTURE SELF VERDICT", W / 2, 88);
+
+  // 5. Giant decorative quote mark (behind everything)
+  ctx.fillStyle = 'rgba(212,147,58,0.07)';
+  ctx.font = "220px Georgia";
+  ctx.fillText("\u201C", W / 2, 270);
+
+  // 6. Decision summary
+  ctx.fillStyle = '#8a8578';
+  ctx.font = "italic 22px Georgia";
+  let shortDecision = decisionSummary.length > 62
+    ? decisionSummary.substring(0, 59) + "…"
+    : decisionSummary;
+  ctx.fillText(`Regarding: "${shortDecision}"`, W / 2, 198);
+
+  // 7. Hero question
+  ctx.fillStyle = '#e8e4d8';
+  ctx.font = "44px Georgia";
+  ctx.fillText("What will 80-year-old you wish you had done?", W / 2, 292);
+
+  // 8. Verdict badge
+  let badgeColor = '#5a9e7a';
+  if (verdictText.toLowerCase().includes('wait') || verdictText.toLowerCase().includes('pause')) badgeColor = '#d4933a';
+  if (verdictText.toLowerCase().includes('pass') || verdictText.toLowerCase().includes('not yet')) badgeColor = '#c0504a';
+
+  const bW = 440, bH = 62, bX = (W - bW) / 2, bY = 352;
+  ctx.fillStyle = badgeColor + '28';
+  ctx.beginPath();
+  ctx.roundRect(bX, bY, bW, bH, 31);
+  ctx.fill();
+  ctx.strokeStyle = badgeColor + '55';
+  ctx.lineWidth = 1.5;
+  ctx.stroke();
+
+  ctx.fillStyle = '#e8e4d8';
+  ctx.font = "bold 19px Georgia";
+  ctx.letterSpacing = "2px";
+  ctx.fillText(verdictText.toUpperCase(), W / 2, bY + 38);
+
+  // 9. Score row
+  if (analysis) {
+    const scores = [
+      { label: 'REGRET IF YOU DON\'T', val: analysis.regretScore },
+      { label: 'DECISION AUTONOMY', val: 100 - analysis.socialFear },
+      { label: 'CLARITY SCORE', val: analysis.composite },
+    ];
+    scores.forEach((s, i) => {
+      const x = 200 + i * 300;
+      ctx.fillStyle = '#d4933a';
+      ctx.font = "bold 40px Georgia";
+      ctx.fillText(s.val + '/100', x, 476);
+      ctx.fillStyle = '#555060';
+      ctx.font = "12px Georgia";
+      ctx.letterSpacing = "1px";
+      ctx.fillText(s.label, x, 498);
+    });
+  }
+
+  // 10. Sign-off
+  ctx.fillStyle = '#8a8578';
+  ctx.font = "italic 19px Georgia";
+  ctx.letterSpacing = "0px";
+  ctx.fillText("— Perspective from the end of your life.", W / 2, 550);
+
+  // 11. URL footer
+  ctx.fillStyle = '#444050';
+  ctx.font = "14px Georgia";
+  ctx.fillText("regretnot.app", W / 2, 590);
 }
 </script>
 </body>
