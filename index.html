@@ -1,0 +1,1549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Regret Minimization Calculator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Crimson+Pro:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #0e0e12;
+    --surface: #16161e;
+    --surface2: #1e1e2a;
+    --border: #2a2a38;
+    --amber: #d4933a;
+    --amber-light: #e8b46a;
+    --amber-dim: rgba(212,147,58,0.15);
+    --text: #e8e4d8;
+    --text-dim: #8a8578;
+    --text-faint: #444050;
+    --serif: 'Playfair Display', Georgia, serif;
+    --body: 'Crimson Pro', 'Georgia', serif;
+    --red: #c0504a;
+    --green: #5a9e7a;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 18px;
+    line-height: 1.7;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* Grain overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 999;
+    opacity: 0.4;
+  }
+
+  /* ── SCREENS ── */
+  .screen {
+    display: none;
+    min-height: 100vh;
+    animation: fadeIn 0.6s ease;
+  }
+  .screen.active { display: flex; }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── LANDING ── */
+  #screen-landing {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 60px 24px;
+    position: relative;
+  }
+
+  .landing-glow {
+    position: absolute;
+    top: 20%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 600px;
+    height: 300px;
+    background: radial-gradient(ellipse, rgba(212,147,58,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .eyebrow {
+    font-family: var(--body);
+    font-size: 12px;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 24px;
+  }
+
+  h1.hero-title {
+    font-family: var(--serif);
+    font-size: clamp(2.4rem, 6vw, 4.2rem);
+    font-weight: 400;
+    line-height: 1.15;
+    max-width: 700px;
+    margin-bottom: 24px;
+    color: var(--text);
+  }
+
+  h1.hero-title em {
+    font-style: italic;
+    color: var(--amber-light);
+  }
+
+  .hero-sub {
+    font-size: 1.1rem;
+    color: var(--text-dim);
+    max-width: 480px;
+    margin: 0 auto 16px;
+    font-weight: 300;
+  }
+
+  .bezos-quote {
+    margin: 36px auto;
+    max-width: 500px;
+    border-left: 2px solid var(--amber);
+    padding: 16px 24px;
+    text-align: left;
+    background: var(--amber-dim);
+    border-radius: 0 8px 8px 0;
+  }
+
+  .bezos-quote p {
+    font-style: italic;
+    color: var(--text);
+    font-size: 1rem;
+    margin-bottom: 8px;
+  }
+
+  .bezos-quote cite {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-style: normal;
+  }
+
+  .btn-primary {
+    display: inline-block;
+    margin-top: 16px;
+    padding: 16px 44px;
+    background: var(--amber);
+    color: #0e0e12;
+    font-family: var(--serif);
+    font-size: 1.05rem;
+    font-weight: 700;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: 0.02em;
+  }
+
+  .btn-primary:hover {
+    background: var(--amber-light);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(212,147,58,0.25);
+  }
+
+  .how-it-works {
+    margin-top: 64px;
+    display: flex;
+    gap: 32px;
+    max-width: 720px;
+    text-align: left;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .how-step {
+    flex: 1;
+    min-width: 180px;
+    max-width: 220px;
+  }
+
+  .how-step .num {
+    font-family: var(--serif);
+    font-size: 2rem;
+    color: var(--amber);
+    opacity: 0.4;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+
+  .how-step h3 {
+    font-family: var(--serif);
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 6px;
+    color: var(--text);
+  }
+
+  .how-step p {
+    font-size: 0.9rem;
+    color: var(--text-dim);
+    line-height: 1.5;
+  }
+
+  /* ── QUIZ SCREEN ── */
+  #screen-quiz {
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 24px 80px;
+  }
+
+  .quiz-header {
+    width: 100%;
+    max-width: 680px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 48px;
+  }
+
+  .quiz-logo {
+    font-family: var(--serif);
+    font-size: 0.95rem;
+    color: var(--text-dim);
+    font-style: italic;
+  }
+
+  .progress-bar-wrap {
+    flex: 1;
+    margin: 0 24px;
+    height: 2px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+  }
+
+  .progress-bar-fill {
+    height: 100%;
+    background: var(--amber);
+    border-radius: 2px;
+    transition: width 0.5s ease;
+  }
+
+  .progress-label {
+    font-size: 0.8rem;
+    color: var(--text-faint);
+    white-space: nowrap;
+    font-family: var(--body);
+  }
+
+  .question-container {
+    width: 100%;
+    max-width: 680px;
+  }
+
+  .question-phase {
+    font-size: 11px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 12px;
+    font-family: var(--body);
+  }
+
+  .question-text {
+    font-family: var(--serif);
+    font-size: clamp(1.4rem, 3vw, 2rem);
+    font-weight: 400;
+    line-height: 1.3;
+    margin-bottom: 8px;
+    color: var(--text);
+  }
+
+  .question-sub {
+    font-size: 0.95rem;
+    color: var(--text-dim);
+    margin-bottom: 32px;
+    font-style: italic;
+  }
+
+  /* Input types */
+  .input-text {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 1.05rem;
+    padding: 16px 20px;
+    resize: vertical;
+    min-height: 80px;
+    outline: none;
+    transition: border-color 0.2s;
+    line-height: 1.6;
+  }
+
+  .input-text:focus { border-color: var(--amber); }
+  .input-text::placeholder { color: var(--text-faint); }
+
+  .input-single {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 1.05rem;
+    padding: 14px 20px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .input-single:focus { border-color: var(--amber); }
+  .input-single::placeholder { color: var(--text-faint); }
+
+  .choices {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .choice-btn {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    color: var(--text);
+    font-family: var(--body);
+    font-size: 1rem;
+    padding: 16px 20px;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.15s;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .choice-btn:hover {
+    border-color: var(--amber);
+    background: var(--amber-dim);
+  }
+
+  .choice-btn.selected {
+    border-color: var(--amber);
+    background: var(--amber-dim);
+    color: var(--amber-light);
+  }
+
+  .choice-letter {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 1px solid currentColor;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    flex-shrink: 0;
+    opacity: 0.6;
+  }
+
+  .slider-wrap {
+    padding: 8px 0;
+  }
+
+  .slider-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    margin-bottom: 12px;
+  }
+
+  input[type=range] {
+    width: 100%;
+    appearance: none;
+    height: 4px;
+    background: var(--border);
+    border-radius: 4px;
+    outline: none;
+    cursor: pointer;
+  }
+
+  input[type=range]::-webkit-slider-thumb {
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--amber);
+    border: 3px solid var(--bg);
+    box-shadow: 0 0 0 1px var(--amber);
+  }
+
+  .slider-value {
+    text-align: center;
+    font-family: var(--serif);
+    font-size: 1.4rem;
+    color: var(--amber);
+    margin-top: 12px;
+  }
+
+  .nav-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 32px;
+    gap: 16px;
+  }
+
+  .btn-back {
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--text-dim);
+    font-family: var(--body);
+    font-size: 0.95rem;
+    padding: 12px 24px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .btn-back:hover { border-color: var(--text-dim); color: var(--text); }
+
+  .btn-next {
+    background: var(--amber);
+    border: none;
+    color: #0e0e12;
+    font-family: var(--serif);
+    font-size: 1rem;
+    font-weight: 700;
+    padding: 14px 36px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+    margin-left: auto;
+  }
+
+  .btn-next:hover:not(:disabled) {
+    background: var(--amber-light);
+    transform: translateY(-1px);
+  }
+
+  .btn-next:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .reflection-box {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--amber);
+    border-radius: 0 8px 8px 0;
+    padding: 16px 20px;
+    margin-top: 24px;
+    font-style: italic;
+    color: var(--text-dim);
+    font-size: 0.95rem;
+  }
+
+  /* ── PROCESSING ── */
+  #screen-processing {
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 60px 24px;
+  }
+
+  .processing-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+    border-top-color: var(--amber);
+    animation: spin 1.2s linear infinite;
+    margin: 0 auto 32px;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .processing-steps {
+    list-style: none;
+    text-align: left;
+    max-width: 340px;
+    margin: 24px auto 0;
+  }
+
+  .processing-steps li {
+    padding: 8px 0;
+    color: var(--text-faint);
+    font-size: 0.95rem;
+    transition: color 0.4s;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .processing-steps li.done { color: var(--text-dim); }
+  .processing-steps li.active { color: var(--amber); }
+
+  .step-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: currentColor;
+    flex-shrink: 0;
+  }
+
+  /* ── RESULT ── */
+  #screen-result {
+    flex-direction: column;
+    align-items: center;
+    padding: 60px 24px 100px;
+  }
+
+  .result-header {
+    text-align: center;
+    margin-bottom: 48px;
+    max-width: 680px;
+  }
+
+  .verdict-badge {
+    display: inline-block;
+    padding: 8px 20px;
+    border-radius: 100px;
+    font-size: 0.8rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    font-family: var(--body);
+    font-weight: 400;
+    margin-bottom: 24px;
+  }
+
+  .verdict-badge.do-it { background: rgba(90,158,122,0.2); color: #7ec4a0; border: 1px solid rgba(90,158,122,0.3); }
+  .verdict-badge.wait  { background: rgba(212,147,58,0.15); color: var(--amber-light); border: 1px solid rgba(212,147,58,0.3); }
+  .verdict-badge.pass  { background: rgba(192,80,74,0.15); color: #e08080; border: 1px solid rgba(192,80,74,0.3); }
+
+  .result-title {
+    font-family: var(--serif);
+    font-size: clamp(1.8rem, 4vw, 3rem);
+    font-weight: 400;
+    line-height: 1.2;
+    margin-bottom: 16px;
+  }
+
+  .result-subtitle {
+    font-size: 1rem;
+    color: var(--text-dim);
+    font-style: italic;
+  }
+
+  .result-card {
+    width: 100%;
+    max-width: 680px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 24px;
+  }
+
+  .result-card-header {
+    padding: 20px 28px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .result-card-icon {
+    font-size: 1.2rem;
+  }
+
+  .result-card-title {
+    font-family: var(--serif);
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .result-card-body {
+    padding: 24px 28px;
+  }
+
+  .score-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+
+  .score-item {
+    flex: 1;
+    min-width: 140px;
+    text-align: center;
+    padding: 16px;
+    background: var(--surface2);
+    border-radius: 8px;
+  }
+
+  .score-num {
+    font-family: var(--serif);
+    font-size: 2.4rem;
+    font-weight: 700;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+
+  .score-label {
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .letter-section {
+    width: 100%;
+    max-width: 680px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 40px 48px;
+    margin-bottom: 24px;
+    position: relative;
+  }
+
+  .letter-section::before {
+    content: '"';
+    position: absolute;
+    top: 16px;
+    left: 32px;
+    font-family: var(--serif);
+    font-size: 5rem;
+    color: var(--amber);
+    opacity: 0.15;
+    line-height: 1;
+  }
+
+  .letter-from {
+    font-size: 0.8rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--amber);
+    margin-bottom: 24px;
+    font-family: var(--body);
+  }
+
+  .letter-body {
+    font-family: var(--serif);
+    font-size: 1.05rem;
+    line-height: 1.85;
+    color: var(--text);
+  }
+
+  .letter-body p { margin-bottom: 20px; }
+  .letter-body p:last-child { margin-bottom: 0; }
+
+  .letter-sig {
+    margin-top: 32px;
+    font-family: var(--serif);
+    font-style: italic;
+    color: var(--text-dim);
+    font-size: 1rem;
+  }
+
+  .insights-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  @media (max-width: 520px) {
+    .insights-grid { grid-template-columns: 1fr; }
+    .letter-section { padding: 32px 24px; }
+    .score-row { gap: 12px; }
+  }
+
+  .insight-item {
+    padding: 16px;
+    background: var(--surface2);
+    border-radius: 8px;
+    border-left: 3px solid var(--border);
+  }
+
+  .insight-item.positive { border-left-color: var(--green); }
+  .insight-item.caution  { border-left-color: var(--amber); }
+  .insight-item.concern  { border-left-color: var(--red); }
+
+  .insight-label {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--text-faint);
+    margin-bottom: 6px;
+  }
+
+  .insight-text {
+    font-size: 0.92rem;
+    color: var(--text-dim);
+    line-height: 1.5;
+  }
+
+  /* Certificate */
+  .cert-section {
+    width: 100%;
+    max-width: 680px;
+    text-align: center;
+    margin-bottom: 24px;
+  }
+
+  .cert-divider {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+  }
+
+  .cert-divider::before, .cert-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .cert-divider span {
+    font-size: 0.75rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+  }
+
+  .share-buttons {
+    display: flex;
+    gap: 12px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .btn-share {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    border-radius: 4px;
+    font-family: var(--body);
+    font-size: 0.95rem;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: var(--surface);
+    color: var(--text-dim);
+    transition: all 0.15s;
+    text-decoration: none;
+  }
+
+  .btn-share:hover { border-color: var(--amber); color: var(--amber); }
+  .btn-share.primary-share { background: var(--amber); border-color: var(--amber); color: #0e0e12; }
+  .btn-share.primary-share:hover { background: var(--amber-light); color: #0e0e12; }
+
+  .restart-link {
+    display: block;
+    text-align: center;
+    margin-top: 48px;
+    color: var(--text-faint);
+    font-size: 0.85rem;
+    cursor: pointer;
+    text-decoration: none;
+    transition: color 0.15s;
+  }
+
+  .restart-link:hover { color: var(--text-dim); }
+
+  /* Tooltip */
+  .tooltip {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(16px);
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 10px 20px;
+    border-radius: 100px;
+    font-size: 0.85rem;
+    opacity: 0;
+    transition: all 0.3s;
+    pointer-events: none;
+    white-space: nowrap;
+    z-index: 100;
+  }
+
+  .tooltip.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* Hidden canvas for certificate */
+  #cert-canvas { display: none; }
+
+</style>
+</head>
+<body>
+
+<!-- ════════════════════════════════════════
+     SCREEN 1: LANDING
+════════════════════════════════════════ -->
+<section id="screen-landing" class="screen active">
+  <div class="landing-glow"></div>
+
+  <p class="eyebrow">Jeff Bezos's Mental Model</p>
+
+  <h1 class="hero-title">
+    What will <em>80-year-old you</em><br>wish you had done?
+  </h1>
+
+  <p class="hero-sub">
+    A structured framework to make your hardest decisions — by looking back from the end of your life.
+  </p>
+
+  <div class="bezos-quote">
+    <p>"I knew that when I was 80, I was not going to regret having tried this. I was not going to regret trying to participate in this thing called the Internet. I knew that if I failed, I wouldn't regret that. But I knew the one thing I might regret is not ever having tried."</p>
+    <cite>— Jeff Bezos, on leaving a Wall Street career to found Amazon</cite>
+  </div>
+
+  <button class="btn-primary" onclick="startQuiz()">Begin your reflection →</button>
+
+  <div class="how-it-works">
+    <div class="how-step">
+      <div class="num">01</div>
+      <h3>Describe your decision</h3>
+      <p>Tell us the choice you're wrestling with and what's holding you back.</p>
+    </div>
+    <div class="how-step">
+      <div class="num">02</div>
+      <h3>Answer 8 deep questions</h3>
+      <p>Structured prompts rooted in psychology and decision science guide you inward.</p>
+    </div>
+    <div class="how-step">
+      <div class="num">03</div>
+      <h3>Receive your verdict</h3>
+      <p>A letter from your 80-year-old self — and a clear, honest recommendation.</p>
+    </div>
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════
+     SCREEN 2: QUIZ
+════════════════════════════════════════ -->
+<section id="screen-quiz" class="screen">
+  <div class="quiz-header">
+    <div class="quiz-logo">Regret Minimization</div>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar-fill" id="progress-fill" style="width:0%"></div>
+    </div>
+    <div class="progress-label" id="progress-label">0 / 9</div>
+  </div>
+
+  <div class="question-container" id="question-container">
+    <!-- injected by JS -->
+  </div>
+</section>
+
+
+<!-- ════════════════════════════════════════
+     SCREEN 3: PROCESSING
+════════════════════════════════════════ -->
+<section id="screen-processing" class="screen">
+  <div class="processing-icon"></div>
+  <h2 style="font-family:var(--serif);font-weight:400;font-size:1.6rem;margin-bottom:8px;">
+    Consulting your future self…
+  </h2>
+  <p style="color:var(--text-dim);font-size:0.95rem;">This takes a moment. It always does.</p>
+
+  <ul class="processing-steps" id="processing-steps">
+    <li id="ps1"><span class="step-dot"></span>Mapping the emotional landscape of your decision</li>
+    <li id="ps2"><span class="step-dot"></span>Calculating regret probability across timelines</li>
+    <li id="ps3"><span class="step-dot"></span>Weighing reversibility and opportunity cost</li>
+    <li id="ps4"><span class="step-dot"></span>Writing a letter from your 80-year-old self</li>
+    <li id="ps5"><span class="step-dot"></span>Preparing your verdict</li>
+  </ul>
+</section>
+
+
+<!-- ════════════════════════════════════════
+     SCREEN 4: RESULT
+════════════════════════════════════════ -->
+<section id="screen-result" class="screen">
+  <div class="result-header">
+    <div id="verdict-badge" class="verdict-badge"></div>
+    <h2 class="result-title" id="result-title"></h2>
+    <p class="result-subtitle" id="result-subtitle"></p>
+  </div>
+
+  <!-- Score card -->
+  <div class="result-card" style="margin-bottom:24px;">
+    <div class="result-card-header">
+      <span class="result-card-icon">📊</span>
+      <span class="result-card-title">Decision Analysis</span>
+    </div>
+    <div class="result-card-body">
+      <div class="score-row" id="score-row"></div>
+    </div>
+  </div>
+
+  <!-- Insights -->
+  <div class="result-card">
+    <div class="result-card-header">
+      <span class="result-card-icon">🔍</span>
+      <span class="result-card-title">Key Insights</span>
+    </div>
+    <div class="result-card-body">
+      <div class="insights-grid" id="insights-grid"></div>
+    </div>
+  </div>
+
+  <!-- Letter -->
+  <div class="letter-section" style="margin-top:24px;">
+    <div class="letter-from">A letter from your 80-year-old self</div>
+    <div class="letter-body" id="letter-body"></div>
+    <div class="letter-sig" id="letter-sig"></div>
+  </div>
+
+  <!-- Share -->
+  <div class="cert-section">
+    <div class="cert-divider"><span>Share your reflection</span></div>
+    <div class="share-buttons">
+      <button class="btn-share primary-share" onclick="copyShareText()">📋 Copy result</button>
+      <a class="btn-share" id="twitter-share" href="#" target="_blank" rel="noopener">𝕏 Share on X</a>
+      <button class="btn-share" onclick="downloadImage()">⬇ Save as image</button>
+    </div>
+  </div>
+
+  <a class="restart-link" onclick="restartQuiz()">← Start over with a new decision</a>
+</section>
+
+<!-- Tooltip -->
+<div class="tooltip" id="tooltip"></div>
+
+<!-- Canvas for certificate image -->
+<canvas id="cert-canvas"></canvas>
+
+<!-- ════════════════════════════════════════
+     JAVASCRIPT ENGINE
+════════════════════════════════════════ -->
+<script>
+// ─────────────────────────────────────────
+// STATE
+// ─────────────────────────────────────────
+const state = {
+  answers: {},
+  currentQ: 0,
+};
+
+// ─────────────────────────────────────────
+// QUESTION DEFINITIONS
+// ─────────────────────────────────────────
+const QUESTIONS = [
+  {
+    id: 'decision',
+    phase: 'The Decision',
+    text: 'What decision are you facing?',
+    sub: 'Describe it in a sentence or two. Don\'t overthink — write what comes naturally.',
+    type: 'textarea',
+    placeholder: 'e.g. "Quit my stable job to start a company" or "Move to another country for love" …',
+    reflection: null,
+  },
+  {
+    id: 'category',
+    phase: 'The Domain',
+    text: 'What area of life does this touch most?',
+    sub: 'Choose the one that feels most central.',
+    type: 'choice',
+    options: [
+      { key: 'career', label: 'Career & Work' },
+      { key: 'relationships', label: 'Love & Relationships' },
+      { key: 'finance', label: 'Money & Financial Security' },
+      { key: 'health', label: 'Health & Body' },
+      { key: 'geography', label: 'Where I Live' },
+      { key: 'creative', label: 'Creative Work or Purpose' },
+      { key: 'family', label: 'Family & Parenting' },
+      { key: 'education', label: 'Education or Skills' },
+    ],
+    reflection: null,
+  },
+  {
+    id: 'fear',
+    phase: 'The Fear',
+    text: 'If you don\'t act — what\'s the fear that\'s really stopping you?',
+    sub: 'Not the logical reason. The quiet fear underneath it.',
+    type: 'textarea',
+    placeholder: 'e.g. "I\'m afraid I\'ll fail and people will see me as someone who couldn\'t make it…"',
+    reflection: 'Most fears are about identity, not outcomes. Notice if yours is about who you\'ll become, not what will happen.',
+  },
+  {
+    id: 'reversibility',
+    phase: 'The Path Back',
+    text: 'If this decision turns out to be wrong — how hard is it to reverse?',
+    sub: 'Most decisions feel permanent. Most aren\'t.',
+    type: 'slider',
+    min: 1,
+    max: 10,
+    minLabel: 'Easily undone',
+    maxLabel: 'Truly irreversible',
+    default: 5,
+    reflection: 'Jeff Bezos calls these "Type 1" (irreversible) and "Type 2" (reversible) decisions. For Type 2 decisions, the cost of inaction is often higher than the cost of a wrong move.',
+  },
+  {
+    id: 'inaction_cost',
+    phase: 'The Cost of Stillness',
+    text: 'What does choosing NOT to act actually cost you?',
+    sub: 'Not choosing is still a choice. What does staying put mean — in 1 year? In 5?',
+    type: 'textarea',
+    placeholder: 'e.g. "Another year in a role that is slowly draining me. Another year closer to 40 without building something of my own…"',
+    reflection: 'We systematically underestimate the cost of inaction because it has no clear moment of failure. But drift is a decision too.',
+  },
+  {
+    id: 'regret_score',
+    phase: 'The 80-Year Test',
+    text: 'Imagine you are 80 years old, looking back. How much would you regret NOT doing this?',
+    sub: 'Your gut knows. Don\'t negotiate with it.',
+    type: 'slider',
+    min: 1,
+    max: 10,
+    minLabel: 'Barely at all',
+    maxLabel: 'Deeply, painfully',
+    default: 5,
+    reflection: null,
+  },
+  {
+    id: 'values_align',
+    phase: 'The Values Check',
+    text: 'Does this decision align with the person you most want to become?',
+    sub: 'Not who others want you to be. The version of yourself you privately admire.',
+    type: 'choice',
+    options: [
+      { key: 'strongly_yes', label: 'Yes — this is exactly who I want to be' },
+      { key: 'somewhat', label: 'Somewhat — it partially aligns' },
+      { key: 'unsure', label: 'I\'m honestly not sure who that person is' },
+      { key: 'no', label: 'Not really — this is about practicality, not identity' },
+    ],
+    reflection: 'Decisions misaligned with values tend to feel hollow even when they succeed. Decisions aligned with values often feel meaningful even when they fail.',
+  },
+  {
+    id: 'others_opinion',
+    phase: 'The Audience',
+    text: 'How much of your hesitation is about what other people will think?',
+    sub: 'Be honest. Most of us carry more of this than we admit.',
+    type: 'slider',
+    min: 0,
+    max: 10,
+    minLabel: 'None at all',
+    maxLabel: 'Almost everything',
+    default: 4,
+    reflection: null,
+  },
+  {
+    id: 'proudest_self',
+    phase: 'The Deepest Question',
+    text: 'In one sentence: what would the proudest version of you do?',
+    sub: 'Not the safest version. Not the version that avoids embarrassment. The proudest one.',
+    type: 'input',
+    placeholder: 'They would…',
+    reflection: 'You already know. You\'ve known for a while.',
+  },
+];
+
+// ─────────────────────────────────────────
+// NAVIGATION
+// ─────────────────────────────────────────
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function startQuiz() {
+  state.currentQ = 0;
+  state.answers = {};
+  showScreen('quiz');
+  renderQuestion();
+}
+
+function restartQuiz() {
+  startQuiz();
+  showScreen('landing');
+  setTimeout(() => showScreen('landing'), 10);
+  location.reload();
+}
+
+// ─────────────────────────────────────────
+// RENDER QUESTION
+// ─────────────────────────────────────────
+function renderQuestion() {
+  const q = QUESTIONS[state.currentQ];
+  const total = QUESTIONS.length;
+  const pct = (state.currentQ / total) * 100;
+
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-label').textContent = state.currentQ + ' / ' + total;
+
+  const saved = state.answers[q.id];
+
+  let inputHTML = '';
+
+  if (q.type === 'textarea') {
+    inputHTML = `<textarea class="input-text" id="q-input" placeholder="${q.placeholder || ''}" oninput="saveAnswer()" rows="4">${saved || ''}</textarea>`;
+  } else if (q.type === 'input') {
+    inputHTML = `<input type="text" class="input-single" id="q-input" placeholder="${q.placeholder || ''}" oninput="saveAnswer()" value="${saved || ''}">`;
+  } else if (q.type === 'choice') {
+    const letters = 'ABCDEFGH';
+    inputHTML = `<div class="choices">` +
+      q.options.map((o, i) =>
+        `<button class="choice-btn ${saved === o.key ? 'selected' : ''}" onclick="selectChoice('${o.key}', this)">
+          <span class="choice-letter">${letters[i]}</span>
+          ${o.label}
+        </button>`
+      ).join('') +
+      `</div>`;
+  } else if (q.type === 'slider') {
+    const val = saved !== undefined ? saved : q.default;
+    inputHTML = `
+      <div class="slider-wrap">
+        <div class="slider-labels">
+          <span>${q.minLabel}</span>
+          <span>${q.maxLabel}</span>
+        </div>
+        <input type="range" id="q-input" min="${q.min}" max="${q.max}" value="${val}"
+          oninput="updateSlider(this)">
+        <div class="slider-value" id="slider-val">${val}</div>
+      </div>`;
+  }
+
+  const reflectionHTML = q.reflection
+    ? `<div class="reflection-box">💡 ${q.reflection}</div>`
+    : '';
+
+  document.getElementById('question-container').innerHTML = `
+    <div class="question-phase">${q.phase}</div>
+    <h2 class="question-text">${q.text}</h2>
+    ${q.sub ? `<p class="question-sub">${q.sub}</p>` : ''}
+    ${inputHTML}
+    ${reflectionHTML}
+    <div class="nav-row">
+      ${state.currentQ > 0
+        ? `<button class="btn-back" onclick="prevQuestion()">← Back</button>`
+        : `<div></div>`
+      }
+      <button class="btn-next" id="btn-next" onclick="nextQuestion()" ${isAnswered(q, saved) ? '' : 'disabled'}>
+        ${state.currentQ === total - 1 ? 'Reveal my verdict →' : 'Continue →'}
+      </button>
+    </div>
+  `;
+
+  // For slider, pre-save default
+  if (q.type === 'slider' && saved === undefined) {
+    state.answers[q.id] = q.default;
+    document.getElementById('btn-next').disabled = false;
+  }
+}
+
+function isAnswered(q, saved) {
+  if (q.type === 'slider') return true;
+  if (q.type === 'choice') return !!saved;
+  return saved && saved.trim().length > 2;
+}
+
+function saveAnswer() {
+  const q = QUESTIONS[state.currentQ];
+  const el = document.getElementById('q-input');
+  if (!el) return;
+  state.answers[q.id] = el.value;
+  document.getElementById('btn-next').disabled = !isAnswered(q, el.value);
+}
+
+function selectChoice(key, el) {
+  const q = QUESTIONS[state.currentQ];
+  state.answers[q.id] = key;
+  document.querySelectorAll('.choice-btn').forEach(b => b.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('btn-next').disabled = false;
+}
+
+function updateSlider(el) {
+  const q = QUESTIONS[state.currentQ];
+  const val = parseInt(el.value);
+  state.answers[q.id] = val;
+  document.getElementById('slider-val').textContent = val;
+  document.getElementById('btn-next').disabled = false;
+}
+
+function nextQuestion() {
+  if (state.currentQ < QUESTIONS.length - 1) {
+    state.currentQ++;
+    renderQuestion();
+  } else {
+    runProcessing();
+  }
+}
+
+function prevQuestion() {
+  if (state.currentQ > 0) {
+    state.currentQ--;
+    renderQuestion();
+  }
+}
+
+// ─────────────────────────────────────────
+// PROCESSING ANIMATION
+// ─────────────────────────────────────────
+function runProcessing() {
+  showScreen('processing');
+  const steps = ['ps1','ps2','ps3','ps4','ps5'];
+  let i = 0;
+
+  function tick() {
+    if (i > 0) document.getElementById(steps[i-1]).className = 'done';
+    if (i < steps.length) {
+      document.getElementById(steps[i]).className = 'active';
+      i++;
+      setTimeout(tick, 700 + Math.random() * 500);
+    } else {
+      setTimeout(showResult, 600);
+    }
+  }
+  setTimeout(tick, 400);
+}
+
+// ─────────────────────────────────────────
+// ANALYSIS ENGINE
+// ─────────────────────────────────────────
+function analyze() {
+  const a = state.answers;
+  const regret = parseInt(a.regret_score) || 5;
+  const reversibility = parseInt(a.reversibility) || 5;
+  const othersOpinion = parseInt(a.others_opinion) || 4;
+  const valuesAlign = a.values_align;
+
+  // Regret probability score (0–100)
+  const regretScore = Math.round(regret * 10);
+
+  // Reversibility impact: high reversibility = lower risk
+  const riskScore = Math.round((reversibility * 0.6 + (10 - regret) * 0.4) * 10);
+
+  // Values alignment weight
+  const valuesScore = { strongly_yes: 90, somewhat: 60, unsure: 40, no: 25 }[valuesAlign] || 50;
+
+  // Social fear penalty
+  const socialFear = Math.round(othersOpinion * 10);
+
+  // Composite: weighted average
+  const composite = Math.round(regretScore * 0.4 + valuesScore * 0.35 + (100 - socialFear) * 0.15 + (100 - riskScore * 0.5) * 0.1);
+
+  let verdict, verdictClass, title, subtitle;
+
+  if (composite >= 68) {
+    verdict = '✦ Do it.';
+    verdictClass = 'do-it';
+    title = 'Your 80-year-old self says: go.';
+    subtitle = 'The evidence, emotional and rational, points the same direction.';
+  } else if (composite >= 45) {
+    verdict = '⟳ Pause, then act.';
+    verdictClass = 'wait';
+    title = 'The answer is yes — but address one thing first.';
+    subtitle = 'You\'re closer to doing it than not doing it.';
+  } else {
+    verdict = '○ Not yet — or not this.';
+    verdictClass = 'pass';
+    title = 'Something about this doesn\'t fully fit — yet.';
+    subtitle = 'This isn\'t a verdict of cowardice. It\'s an invitation to clarity.';
+  }
+
+  return { regretScore, riskScore, valuesScore, socialFear, composite, verdict, verdictClass, title, subtitle };
+}
+
+// ─────────────────────────────────────────
+// LETTER GENERATOR
+// ─────────────────────────────────────────
+function generateLetter(analysis) {
+  const a = state.answers;
+  const { regretScore, composite, verdictClass } = analysis;
+  const decision = a.decision || 'this decision';
+  const fear = a.fear || 'what held you back';
+  const proudSelf = a.proudest_self || 'to act bravely';
+  const category = a.category || 'life';
+
+  const categoryPhrases = {
+    career: 'career',
+    relationships: 'heart',
+    finance: 'financial life',
+    health: 'body and health',
+    geography: 'the place you called home',
+    creative: 'creative work',
+    family: 'family',
+    education: 'education',
+  };
+  const categoryWord = categoryPhrases[category] || 'life';
+
+  let p1, p2, p3, p4;
+
+  if (verdictClass === 'do-it') {
+    p1 = `I remember standing where you are standing now — holding that question about ${decision.toLowerCase().replace(/[.!?]+$/,'')}. I remember the weight of it. I want you to know: the fear was real. But so was what waited on the other side.`;
+
+    p2 = `What I can tell you from here — all these years later — is that the fear about ${fear.toLowerCase().replace(/[.!?]+$/,'')} never quite matched the reality. Fear has a way of inflating consequences. The actual doing of the thing is always more manageable than the imagining of it.`;
+
+    p3 = `The people who seemed to be watching, judging? Most of them were too absorbed in their own lives to care for long. And the ones who truly mattered? They came around. They always do when you show them who you actually are.`;
+
+    p4 = `${proudSelf ? `You wanted to know what the proudest version of you would do. The answer was already in that sentence.` : `Trust the version of yourself who already knows the answer.`} I am living in the life that choice built. It wasn't always easy. But I am not sitting here wishing you had played it safe.`;
+  } else if (verdictClass === 'wait') {
+    p1 = `I remember the confusion you're feeling — the sense that the answer keeps slipping away each time you try to hold it. About ${decision.toLowerCase().replace(/[.!?]+$/,'')}. It was one of the longest questions I carried.`;
+
+    p2 = `Here is what I wish someone had told me: the hesitation wasn't weakness. It was your intelligence noticing that something still needed resolving. You were right to pause. But don't let the pause become a permanent address.`;
+
+    p3 = `The cost of never finding out — I felt that too. Not dramatically, but quietly. In moments when I wondered. You still have time to find out. The question is whether you'll give yourself permission.`;
+
+    p4 = `${proudSelf ? `You asked what the proudest version of you would do. That question is your compass.` : `The answer is closer than you think.`} Come back to it when the noise gets quieter. Then move.`;
+  } else {
+    p1 = `I want to be honest with you about ${decision.toLowerCase().replace(/[.!?]+$/,'')}. From here, looking back, I understand why you were drawn to it. I understand what it represented. But I also understand why it wasn't quite right — not in that form, not at that time.`;
+
+    p2 = `The fear about ${fear.toLowerCase().replace(/[.!?]+$/,'')} was not the only thing in the way. There was something in the misalignment — between what the decision required and who you were becoming. That friction was information.`;
+
+    p3 = `This is not a verdict of cowardice. Some of the best decisions I made were the ones I didn't make — the ones that freed me to find the thing that actually fit. The question underneath the question is usually more important than the question itself.`;
+
+    p4 = `What is it you're really after? Find that. Then find a path toward it that feels more true. I am rooting for you from here. The right version of this is still waiting.`;
+  }
+
+  return { p1, p2, p3, p4 };
+}
+
+// ─────────────────────────────────────────
+// INSIGHTS
+// ─────────────────────────────────────────
+function generateInsights(analysis) {
+  const a = state.answers;
+  const { regretScore, socialFear, reversibility, valuesScore, verdictClass } = analysis;
+  const insights = [];
+
+  // Regret insight
+  if (regretScore >= 70) {
+    insights.push({ type: 'positive', label: 'Regret Risk', text: 'Your gut strongly fears inaction. This is significant data — not noise.' });
+  } else if (regretScore >= 40) {
+    insights.push({ type: 'caution', label: 'Regret Risk', text: 'Moderate regret risk. Enough to take seriously; not overwhelming.' });
+  } else {
+    insights.push({ type: 'positive', label: 'Regret Risk', text: 'Low regret risk either way. This may be a safer domain to be cautious in.' });
+  }
+
+  // Social fear
+  if (socialFear >= 60) {
+    insights.push({ type: 'concern', label: 'Social Fear', text: 'A significant share of your hesitation is about others\' opinions — not the decision itself.' });
+  } else if (socialFear >= 30) {
+    insights.push({ type: 'caution', label: 'Social Fear', text: 'Some concern about perception. Normal, but worth examining.' });
+  } else {
+    insights.push({ type: 'positive', label: 'Social Fear', text: 'You\'re deciding for yourself, not for an audience. A good sign.' });
+  }
+
+  // Reversibility
+  const rev = parseInt(a.reversibility) || 5;
+  if (rev <= 3) {
+    insights.push({ type: 'positive', label: 'Reversibility', text: 'This decision is mostly reversible. The cost of trying is low; the cost of never trying may be higher.' });
+  } else if (rev <= 6) {
+    insights.push({ type: 'caution', label: 'Reversibility', text: 'Partly reversible. Some consequences would stick, but you\'re not locked in completely.' });
+  } else {
+    insights.push({ type: 'concern', label: 'Reversibility', text: 'High irreversibility. This warrants careful, deliberate consideration — not avoidance.' });
+  }
+
+  // Values
+  if (valuesScore >= 80) {
+    insights.push({ type: 'positive', label: 'Identity Alignment', text: 'This aligns with who you want to become. Identity-aligned decisions tend to sustain motivation even through hardship.' });
+  } else if (valuesScore >= 50) {
+    insights.push({ type: 'caution', label: 'Identity Alignment', text: 'Partial alignment. Consider what version of yourself this builds toward.' });
+  } else {
+    insights.push({ type: 'concern', label: 'Identity Alignment', text: 'Low alignment with your deeper values. Even successful outcomes here might feel hollow.' });
+  }
+
+  return insights.slice(0, 4);
+}
+
+// ─────────────────────────────────────────
+// SHOW RESULT
+// ─────────────────────────────────────────
+function showResult() {
+  const analysis = analyze();
+  const letter = generateLetter(analysis);
+  const insights = generateInsights(analysis);
+
+  showScreen('result');
+
+  // Badge & title
+  document.getElementById('verdict-badge').textContent = analysis.verdict;
+  document.getElementById('verdict-badge').className = 'verdict-badge ' + analysis.verdictClass;
+  document.getElementById('result-title').textContent = analysis.title;
+  document.getElementById('result-subtitle').textContent = analysis.subtitle;
+
+  // Scores
+  const scoreColors = {
+    regretScore: analysis.regretScore >= 70 ? '#c0504a' : analysis.regretScore >= 40 ? '#d4933a' : '#5a9e7a',
+    composite: analysis.composite >= 68 ? '#5a9e7a' : analysis.composite >= 45 ? '#d4933a' : '#c0504a',
+  };
+
+  document.getElementById('score-row').innerHTML = `
+    <div class="score-item">
+      <div class="score-num" style="color:${scoreColors.regretScore}">${analysis.regretScore}<span style="font-size:1rem;opacity:0.5">/100</span></div>
+      <div class="score-label">Regret if you don't</div>
+    </div>
+    <div class="score-item">
+      <div class="score-num" style="color:#888">${100 - analysis.socialFear}<span style="font-size:1rem;opacity:0.5">/100</span></div>
+      <div class="score-label">Decision autonomy</div>
+    </div>
+    <div class="score-item">
+      <div class="score-num" style="color:${scoreColors.composite}">${analysis.composite}<span style="font-size:1rem;opacity:0.5">/100</span></div>
+      <div class="score-label">Overall clarity score</div>
+    </div>
+  `;
+
+  // Insights
+  document.getElementById('insights-grid').innerHTML = insights.map(ins => `
+    <div class="insight-item ${ins.type}">
+      <div class="insight-label">${ins.label}</div>
+      <div class="insight-text">${ins.text}</div>
+    </div>
+  `).join('');
+
+  // Letter
+  document.getElementById('letter-body').innerHTML = `
+    <p>${letter.p1}</p>
+    <p>${letter.p2}</p>
+    <p>${letter.p3}</p>
+    <p>${letter.p4}</p>
+  `;
+  document.getElementById('letter-sig').innerHTML = `With love and hindsight,<br><em>You, at 80</em>`;
+
+  // Twitter share
+  const tweetText = encodeURIComponent(
+    `I just used The Regret Minimization Calculator — a framework based on Jeff Bezos's mental model for big life decisions.\n\nMy verdict: "${analysis.verdict}"\n\nTry it: `
+  );
+  document.getElementById('twitter-share').href = `https://twitter.com/intent/tweet?text=${tweetText}&url=${encodeURIComponent(location.href)}`;
+}
+
+// ─────────────────────────────────────────
+// SHARE UTILITIES
+// ─────────────────────────────────────────
+function showTooltip(msg) {
+  const t = document.getElementById('tooltip');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2200);
+}
+
+function copyShareText() {
+  const analysis = analyze();
+  const a = state.answers;
+  const text = `🧠 The Regret Minimization Calculator
+
+My decision: "${a.decision || '...'}"
+Verdict: ${analysis.verdict}
+Regret score if I don't act: ${analysis.regretScore}/100
+Overall clarity: ${analysis.composite}/100
+
+"${analysis.title}"
+
+Try it yourself: ${location.href}`;
+
+  navigator.clipboard.writeText(text).then(() => showTooltip('✓ Copied to clipboard'));
+}
+
+function downloadImage() {
+  const canvas = document.getElementById('cert-canvas');
+  const ctx = canvas.getContext('2d');
+  const W = 1200, H = 630;
+  canvas.width = W; canvas.height = H;
+
+  const analysis = analyze();
+  const a = state.answers;
+
+  // Background
+  ctx.fillStyle = '#0e0e12';
+  ctx.fillRect(0, 0, W, H);
+
+  // Amber accent bar
+  ctx.fillStyle = '#d4933a';
+  ctx.fillRect(0, 0, 6, H);
+
+  // Border
+  ctx.strokeStyle = '#2a2a38';
+  ctx.lineWidth = 1;
+  ctx.strokeRect(30, 30, W - 60, H - 60);
+
+  // Eyebrow
+  ctx.fillStyle = '#d4933a';
+  ctx.font = '600 14px Georgia';
+  ctx.letterSpacing = '0.2em';
+  ctx.fillText('REGRET MINIMIZATION CALCULATOR', 80, 90);
+
+  // Verdict
+  ctx.fillStyle = '#e8e4d8';
+  ctx.font = 'italic 400 52px Georgia';
+  const verdict = analysis.verdict;
+  ctx.fillText(verdict, 80, 180);
+
+  // Decision preview
+  const dec = (a.decision || '').substring(0, 70) + ((a.decision || '').length > 70 ? '…' : '');
+  ctx.fillStyle = '#8a8578';
+  ctx.font = '300 22px Georgia';
+  ctx.fillText('"' + dec + '"', 80, 240);
+
+  // Title
+  ctx.fillStyle = '#e8e4d8';
+  ctx.font = '400 28px Georgia';
+  const title = analysis.title;
+  ctx.fillText(title, 80, 320);
+
+  // Scores
+  const scores = [
+    { label: 'Regret if you don\'t', val: analysis.regretScore },
+    { label: 'Decision autonomy', val: 100 - analysis.socialFear },
+    { label: 'Clarity score', val: analysis.composite },
+  ];
+  scores.forEach((s, i) => {
+    const x = 80 + i * 340;
+    ctx.fillStyle = '#d4933a';
+    ctx.font = 'bold 48px Georgia';
+    ctx.fillText(s.val, x, 430);
+    ctx.fillStyle = '#8a8578';
+    ctx.font = '300 15px Georgia';
+    ctx.fillText(s.label.toUpperCase(), x, 460);
+  });
+
+  // Footer
+  ctx.fillStyle = '#444050';
+  ctx.font = '300 14px Georgia';
+  ctx.fillText('regret-minimization-calculator.github.io', 80, H - 50);
+
+  ctx.fillStyle = '#d4933a';
+  ctx.font = 'italic 400 15px Georgia';
+  ctx.fillText('"What will 80-year-old you wish you had done?"', W - 80 - 420, H - 50);
+
+  // Download
+  const link = document.createElement('a');
+  link.download = 'regret-minimization-result.png';
+  link.href = canvas.toDataURL('image/png');
+  link.click();
+  showTooltip('✓ Image downloaded');
+}
+</script>
+</body>
+</html>
